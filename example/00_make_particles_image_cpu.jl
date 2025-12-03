@@ -169,7 +169,7 @@ end
 # 共通処理（任意サイズで計算）
 # ============================================
 function run_simulation(W, H, PART_NUM, prefix)
-    out_dir = "../00_images"
+    out_dir = "./00_images"
     make_dirs(out_dir)
 
     println("1. 粒子径生成...")
