@@ -1,65 +1,106 @@
 # PIVUtils.jl
 
 **PIVUtils.jl** は Julia で実装された **粒子画像流速測定（PIV: Particle Image Velocimetry）** 用ライブラリです。  
-CPU と CUDA GPU の両方に対応しており、以下の機能を備えています。
+CPU と CUDA GPU の両方に対応し、次の機能を備えています：
 
-- 正規化相互相関（NCC: Normalized Cross-Correlation）
-- サブピクセル精度のピーク推定（放物線フィッティング）
-- 3×3 近傍統計に基づく外れ値除去
+- 正規化相互相関（NCC）
+- サブピクセル精度推定（放物線フィッティング）
+- 3×3 近傍統計による外れ値除去
 - CPU / GPU API の統一
-- ベクトル場の保存や可視化の例スクリプト
-
-流体力学・マイクロ流体・ホログラフィック計測など、  
-連続画像から速度場を推定する研究用途に向いています。
 
 ---
 
-## 🚀 特徴
+## 📦 依存ライブラリ
 
-### 🔹 CPU PIV（`PIV_cpu`）
-- C の古典的実装を正確に再現した NCC ベースの相関計算
-- 全探索（search window scanning）
-- サブピクセル補間（2 次曲線）
-- 3×3 領域の統計量を用いた外れ値ベクトル除去  
-  → `remove_error_vec` によるロバスト化
+このパッケージが必要とする依存関係は以下の 3 つです：
 
-### 🔹 GPU PIV（`PIV_gpu`）
-- CUDA kernel によって search window 全体を並列処理  
-- 大規模画像で大幅な高速化
-- CPU 版とほぼ同等の出力再現  
-- NVIDIA GPU があれば自動的に CuArray を使用
-
-### 🔹 補助機能
-- `parabolic_subpixel(R, x0, y0)`  
-  サブピクセル精度のピーク補間
-- `remove_error_vec(dx, dy)`  
-  近傍統計による外れ値除去
-- Example スクリプトによる CPU/GPU デモンストレーション
-
----
-
-## 📦 インストール方法
-
-PIVUtils.jl はまだ Julia の General Registry には登録していません。  
-GitHub から直接インストールできます：
-
-```julia
-] add https://github.com/yourname/PIVUtils.jl
+```
+CUDA
+Images
+StatsBase
 ```
 
-※ `yourname` の部分はあなたの GitHub ユーザー名に変更してください。
+これらは **PIVUtils のプロジェクト環境側** で管理されます。
 
 ---
 
-## 📝 使い方
+## 🔧 開発者向けセットアップ（PIVUtils を開発する場合）
 
-### CPU 版
+PIVUtils のフォルダに移動して：
+
+```bash
+cd /path/to/PIVUtils
+```
+
+### ① プロジェクト環境をアクティベート
 
 ```julia
-using PIVUtils, ImageUtils
+] activate .
+```
 
-img1 = read_img_gray_float64("img_0000.png")
-img2 = read_img_gray_float64("img_0001.png")
+### ② 依存パッケージを追加（1回だけでOK）
+
+```julia
+] add CUDA Images StatsBase
+```
+
+これで `Project.toml` と `Manifest.toml` に依存が記録されます。
+
+---
+
+## 🧑‍💻 利用者向けインストール方法（ローカルパッケージとして使う）
+
+PIVUtils は General Registry には登録されていません。  
+そのため **ローカルパスを dev 登録して使用**します。
+
+### ① PIVUtils フォルダを任意の場所に置く
+
+例：
+
+```
+/home/user/Projects/PIVUtils
+```
+
+### ② Julia のグローバル環境を開く
+
+```julia
+julia
+]
+```
+
+### ③ ローカルパッケージとして登録
+
+```julia
+dev /home/user/Projects/PIVUtils
+```
+
+相対パスでも可：
+
+```julia
+dev ./PIVUtils
+```
+
+### ④ 依存関係を解決
+
+```julia
+resolve
+```
+
+### ⑤ 使用開始
+
+```julia
+using PIVUtils
+```
+
+---
+
+## 🚀 CPU 版の使用例
+
+```julia
+using PIVUtils, Images
+
+img1 = Float64.(Gray.(load("img_0000.png")))
+img2 = Float64.(Gray.(load("img_0001.png")))
 
 dx, dy, R = PIV_cpu(img1, img2;
     interro_win_w = 32,
@@ -68,13 +109,15 @@ dx, dy, R = PIV_cpu(img1, img2;
 )
 ```
 
-### GPU 版
+---
+
+## ⚡ GPU 版の使用例
 
 ```julia
-using PIVUtils, ImageUtils, CUDA
+using PIVUtils, Images, CUDA
 
-img1 = read_img_gray_float64("img_0000.png")
-img2 = read_img_gray_float64("img_0001.png")
+img1 = Float64.(Gray.(load("img_0000.png")))
+img2 = Float64.(Gray.(load("img_0001.png")))
 
 dx, dy, R = PIV_gpu(img1, img2;
     interro_win_w = 32,
@@ -85,12 +128,12 @@ dx, dy, R = PIV_gpu(img1, img2;
 
 ---
 
-## 📂 フォルダ構成
+## 📂 フォルダ構成（推奨）
 
 ```
 PIVUtils/
 ├── src/
-│   └── PIVUtils.jl        # メインモジュール
+│   └── PIVUtils.jl
 ├── example/
 │   ├── 00_make_particles_image_cpu.jl
 │   ├── 00-1_PIV_cpu.jl
@@ -102,18 +145,7 @@ PIVUtils/
 
 ---
 
-## 📘 仕組みの概要
-
-1. **interrogation window の抽出**  
-2. **search window の走査**  
-3. **NCC による相関計算**（CPU: ループ / GPU: CUDA kernel）
-4. **ピーク検出（最大相関値）**
-5. **サブピクセル補間（parabolic_subpixel）**
-6. **外れ値除去（remove_error_vec）**
-
----
-
-## 📄 ライセンス
+## 📝 ライセンス
 
 MIT License.
 
