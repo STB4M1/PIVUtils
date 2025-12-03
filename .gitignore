@@ -1,0 +1,30 @@
+# === Julia standard ignores ===
+*.jl.*       # temporary files
+*~           # backup files
+*.swp        # Vim swap
+*.swo
+.DS_Store
+
+# === Julia compiled files ===
+*.ji
+compiled/*
+deps/build.log
+
+# === Manifest (optional to ignore) ===
+# もし開発環境固有の Manifest を公開したくない場合はコメント解除
+# Manifest.toml
+
+# === VSCode ===
+.vscode/
+
+# === Example / Output files ===
+example/*.png
+example/*.jpg
+example/*.bmp
+example/*.dat
+
+# === Logs ===
+*.log
+
+# === OS-specific ===
+Thumbs.db

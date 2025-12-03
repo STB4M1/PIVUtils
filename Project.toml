@@ -1,0 +1,10 @@
+name = "PIVUtils"
+uuid = "ef3ebb4b-0e35-47a1-909c-676f2961cd94"
+authors = ["Mitsuki ISHIYAMA <162681396+STB4M1@users.noreply.github.com>"]
+version = "0.1.0"
+
+[deps]
+CUDA = "052768ef-5323-5732-b1bb-66c8b64840ba"
+
+[compat]
+CUDA = "5.9.5"
