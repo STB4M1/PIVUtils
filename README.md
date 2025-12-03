@@ -38,13 +38,35 @@ CPU と CUDA GPU の両方に対応しており、以下の機能を備えてい
 
 ---
 
-## 📦 インストール方法
+### 📦 依存ライブラリ
 
-PIVUtils.jl はまだ Julia の General Registry には登録していません。  
-GitHub から直接インストールできます：
+```
+CUDA
+Images
+StatsBase
+```
+
+---
+
+### 🔧 開発者（PIVUtils を編集する側）
+
+```bash
+cd /path/to/PIVUtils
+```
 
 ```julia
-] add https://github.com/yourname/PIVUtils.jl
+] activate .
+] add CUDA Images StatsBase
+```
+
+---
+
+### 🧑‍💻 利用者（PIVUtils を使う側）
+
+```julia
+] dev /path/to/PIVUtils
+] resolve
+using PIVUtils
 ```
 
 ---
